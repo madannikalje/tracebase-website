@@ -27,12 +27,12 @@ function CursorGlow() {
     <motion.div
       className="fixed pointer-events-none rounded-full"
       style={{
-        width: 400,
-        height: 400,
+        width: 700,
+        height: 700,
         x,
         y,
-        background: 'radial-gradient(circle, rgba(77,158,255,0.055) 0%, transparent 70%)',
-        filter: 'blur(48px)',
+        background: 'radial-gradient(circle, rgba(77,158,255,0.22) 0%, rgba(77,158,255,0.08) 40%, transparent 75%)',
+        filter: 'blur(20px)',
         zIndex: 0,
       }}
     />
@@ -46,12 +46,12 @@ function BackgroundOrbs() {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 700,
-          height: 700,
-          top: '-15%',
-          left: '-5%',
-          background: 'radial-gradient(circle, rgba(77,158,255,0.07) 0%, transparent 65%)',
-          filter: 'blur(32px)',
+          width: 1000,
+          height: 1000,
+          top: '-20%',
+          left: '-15%',
+          background: 'radial-gradient(circle, rgba(77,158,255,0.2) 0%, rgba(77,158,255,0.07) 45%, transparent 75%)',
+          filter: 'blur(16px)',
         }}
         animate={{ x: [0, 50, -20, 0], y: [0, 30, -40, 0] }}
         transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
@@ -61,12 +61,12 @@ function BackgroundOrbs() {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 600,
-          height: 600,
-          bottom: '5%',
-          right: '-8%',
-          background: 'radial-gradient(circle, rgba(120,80,255,0.06) 0%, transparent 65%)',
-          filter: 'blur(40px)',
+          width: 900,
+          height: 900,
+          bottom: '-5%',
+          right: '-15%',
+          background: 'radial-gradient(circle, rgba(120,80,255,0.18) 0%, rgba(120,80,255,0.07) 45%, transparent 75%)',
+          filter: 'blur(18px)',
         }}
         animate={{ x: [0, -40, 20, 0], y: [0, -30, 50, 0] }}
         transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
@@ -76,12 +76,12 @@ function BackgroundOrbs() {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 400,
-          height: 400,
-          top: '40%',
-          left: '55%',
-          background: 'radial-gradient(circle, rgba(0,210,190,0.04) 0%, transparent 65%)',
-          filter: 'blur(48px)',
+          width: 700,
+          height: 700,
+          top: '35%',
+          left: '50%',
+          background: 'radial-gradient(circle, rgba(0,210,190,0.14) 0%, rgba(0,210,190,0.05) 45%, transparent 75%)',
+          filter: 'blur(20px)',
         }}
         animate={{ x: [0, 30, -50, 0], y: [0, -50, 20, 0] }}
         transition={{ duration: 34, repeat: Infinity, ease: 'easeInOut', delay: 10 }}
