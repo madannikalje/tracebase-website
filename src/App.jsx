@@ -6,6 +6,7 @@ import Problems from './components/Problems'
 import Solution from './components/Solution'
 import Pricing from './components/Pricing'
 import Footer from './components/Footer'
+import LedgerVisualization from './components/LedgerVisualization'
 
 function CursorGlow() {
   const rawX = useMotionValue(-2000)
@@ -308,6 +309,7 @@ export default function App() {
         <main>
           <Hero />
           <Problems />
+          <LedgerVisualization />
           <Solution />
           <Pricing />
         </main>
