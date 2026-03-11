@@ -107,11 +107,37 @@ function ArchDiagram() {
             {/* Connector */}
             {!isLast && (
               <div className="flex flex-col items-center py-0.5 gap-0.5">
-                <div className="w-px h-3 bg-[#1E1E1E]" />
+                {/* Top line + flowing particle */}
+                <div className="relative flex flex-col items-center" style={{ height: 14 }}>
+                  <div className="w-px h-full bg-[#1E1E1E]" />
+                  <motion.div
+                    animate={{ y: [0, 14], opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.22, ease: 'linear' }}
+                    style={{
+                      position: 'absolute', top: 0,
+                      width: 3, height: 3, borderRadius: '50%',
+                      background: '#4D9EFF',
+                      boxShadow: '0 0 5px rgba(77,158,255,0.9)',
+                    }}
+                  />
+                </div>
                 <span className="text-[10px] font-mono text-[#2D2D2D] px-2 py-0.5 border border-[#1A1A1A] rounded bg-[#0A0A0A]">
                   {step.connector}
                 </span>
-                <div className="w-px h-3 bg-[#1E1E1E]" />
+                {/* Bottom line + flowing particle */}
+                <div className="relative flex flex-col items-center" style={{ height: 14 }}>
+                  <div className="w-px h-full bg-[#1E1E1E]" />
+                  <motion.div
+                    animate={{ y: [0, 14], opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.22 + 0.6, ease: 'linear' }}
+                    style={{
+                      position: 'absolute', top: 0,
+                      width: 3, height: 3, borderRadius: '50%',
+                      background: '#4D9EFF',
+                      boxShadow: '0 0 5px rgba(77,158,255,0.9)',
+                    }}
+                  />
+                </div>
                 <ChevronDown className="w-3 h-3 text-[#252525]" />
               </div>
             )}
