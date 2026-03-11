@@ -111,8 +111,8 @@ function ArchDiagram() {
                 <div className="relative flex flex-col items-center" style={{ height: 14 }}>
                   <div className="w-px h-full bg-[#1E1E1E]" />
                   <motion.div
-                    animate={{ y: [0, 14], opacity: [0, 1, 0] }}
-                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.22, ease: 'linear' }}
+                    animate={{ y: [0, 14], opacity: [0, 0.85, 0] }}
+                    transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.28, ease: 'linear' }}
                     style={{
                       position: 'absolute', top: 0,
                       width: 3, height: 3, borderRadius: '50%',
@@ -129,7 +129,7 @@ function ArchDiagram() {
                   <div className="w-px h-full bg-[#1E1E1E]" />
                   <motion.div
                     animate={{ y: [0, 14], opacity: [0, 1, 0] }}
-                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.22 + 0.6, ease: 'linear' }}
+                    transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.28 + 0.9, ease: 'linear' }}
                     style={{
                       position: 'absolute', top: 0,
                       width: 3, height: 3, borderRadius: '50%',

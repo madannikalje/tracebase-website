@@ -1,6 +1,10 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { ShieldCheck, Link, Activity } from 'lucide-react'
+import { ShieldCheck, Link } from 'lucide-react'
+
+// ─── Easing shared across the section ─────────────────────────────────────────
+// Smooth deceleration — like data loading into place, no bounce
+const EASE = [0.25, 1, 0.5, 1]
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 const EVENTS = [
@@ -57,66 +61,34 @@ const EVENTS = [
 ]
 
 const RISK_STYLES = {
-  INFO:     { text: '#4D9EFF', bg: 'rgba(77,158,255,0.08)',  border: 'rgba(77,158,255,0.22)',  glow: 'rgba(77,158,255,0.12)'  },
-  MEDIUM:   { text: '#F0A500', bg: 'rgba(240,165,0,0.08)',   border: 'rgba(240,165,0,0.22)',   glow: 'rgba(240,165,0,0.10)'   },
-  HIGH:     { text: '#FF8C42', bg: 'rgba(255,140,66,0.08)',  border: 'rgba(255,140,66,0.22)',  glow: 'rgba(255,140,66,0.10)'  },
-  CRITICAL: { text: '#FF4D4D', bg: 'rgba(255,77,77,0.08)',   border: 'rgba(255,77,77,0.22)',   glow: 'rgba(255,77,77,0.12)'   },
+  INFO:     { text: '#4D9EFF', bg: 'rgba(77,158,255,0.08)',  border: 'rgba(77,158,255,0.20)'  },
+  MEDIUM:   { text: '#F0A500', bg: 'rgba(240,165,0,0.08)',   border: 'rgba(240,165,0,0.20)'   },
+  HIGH:     { text: '#FF8C42', bg: 'rgba(255,140,66,0.08)',  border: 'rgba(255,140,66,0.20)'  },
+  CRITICAL: { text: '#FF4D4D', bg: 'rgba(255,77,77,0.08)',   border: 'rgba(255,77,77,0.28)'   },
 }
 
 // ─── Single audit event card ───────────────────────────────────────────────────
 function AuditCard({ event, index }) {
   const risk = RISK_STYLES[event.risk]
-  const isCritical = event.risk === 'CRITICAL'
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 36, x: -12 }}
-      whileInView={{ opacity: 1, y: 0, x: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: index * 0.13, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.55, delay: index * 0.09, ease: EASE }}
       whileHover={{
-        scale: 1.012,
-        boxShadow: `0 0 28px ${risk.glow}, 0 0 0 1px ${risk.border}`,
-        transition: { duration: 0.18 },
+        borderColor: risk.text,
+        boxShadow: `0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px ${risk.border}`,
+        transition: { duration: 0.15, ease: 'easeOut' },
       }}
-      style={{ border: `1px solid ${risk.border}`, borderRadius: 12, position: 'relative' }}
+      style={{ border: `1px solid ${risk.border}`, borderRadius: 12 }}
       className="w-full bg-[#080808] overflow-hidden flex cursor-default"
     >
-      {/* Scan line that sweeps on entry */}
-      <motion.div
-        initial={{ x: '-100%', opacity: 0.7 }}
-        whileInView={{ x: '300%', opacity: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.0, delay: index * 0.13 + 0.3, ease: 'easeIn' }}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '35%',
-          background: `linear-gradient(to right, transparent, ${risk.glow}, transparent)`,
-          pointerEvents: 'none',
-          zIndex: 5,
-        }}
-      />
-
-      {/* CRITICAL: pulsing border glow */}
-      {isCritical && (
-        <motion.div
-          animate={{ opacity: [0.4, 0.9, 0.4] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute', inset: -1, borderRadius: 12,
-            boxShadow: `0 0 16px ${risk.glow}`,
-            border: `1px solid ${risk.border}`,
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-      )}
-
       {/* Risk accent bar */}
-      <div className="w-0.5 shrink-0 relative z-10" style={{ background: risk.text, opacity: 0.45 }} />
+      <div className="w-0.5 shrink-0" style={{ background: risk.text, opacity: 0.5 }} />
 
-      <div className="flex-1 p-4 relative z-10">
+      <div className="flex-1 p-4">
         {/* Top row */}
         <div className="flex items-center gap-3 mb-2.5 flex-wrap">
           <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.18)' }}>
@@ -125,125 +97,110 @@ function AuditCard({ event, index }) {
           <span className="font-mono text-xs font-semibold" style={{ color: risk.text }}>
             {event.action}
           </span>
-          <motion.span
-            initial={{ opacity: 0, scale: 0.7 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.25, delay: index * 0.13 + 0.28, type: 'spring', stiffness: 300 }}
+          <span
             className="ml-auto font-mono text-[9px] font-bold uppercase px-2 py-0.5 rounded"
             style={{ color: risk.text, background: risk.bg, border: `1px solid ${risk.border}` }}
           >
             {event.risk}
-          </motion.span>
+          </span>
         </div>
 
         {/* Middle row */}
-        <div className="flex items-center gap-3 font-mono text-[11px] text-[#333] mb-3 flex-wrap">
+        <div className="flex items-center gap-3 font-mono text-[11px] mb-3 flex-wrap"
+          style={{ color: '#2E2E2E' }}>
           <span>{event.actor}</span>
-          <span className="text-[#222]">·</span>
+          <span style={{ color: '#1E1E1E' }}>·</span>
           <span>{event.ip}</span>
-          <span className="text-[#222]">·</span>
-          <span className="text-[#2A2A2A]">[{event.ts}]</span>
+          <span style={{ color: '#1E1E1E' }}>·</span>
+          <span>[{event.ts}]</span>
         </div>
 
-        {/* Bottom: chain link */}
-        <div
+        {/* Bottom: hash chain */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: index * 0.09 + 0.35, ease: 'easeOut' }}
           className="flex items-center gap-2 font-mono text-[10px] pt-2.5"
           style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
         >
-          <Link size={10} style={{ color: 'rgba(77,158,255,0.4)', flexShrink: 0 }} />
-          <span style={{ color: 'rgba(255,255,255,0.12)' }}>prev:</span>
-          <span style={{ color: 'rgba(77,158,255,0.32)' }}>{event.prevHash}</span>
-          <motion.div
-            initial={{ opacity: 0, x: 8 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3, delay: index * 0.13 + 0.42 }}
-            className="flex items-center gap-1.5 ml-auto"
-          >
-            <ShieldCheck size={10} style={{ color: '#4D9EFF', opacity: 0.65 }} />
-            <span style={{ color: 'rgba(77,158,255,0.5)' }}>SIGNED · {event.hash}</span>
-          </motion.div>
-        </div>
+          <Link size={10} style={{ color: 'rgba(77,158,255,0.38)', flexShrink: 0 }} />
+          <span style={{ color: 'rgba(255,255,255,0.1)' }}>prev:</span>
+          <span style={{ color: 'rgba(77,158,255,0.3)' }}>{event.prevHash}</span>
+          <div className="flex items-center gap-1.5 ml-auto">
+            <ShieldCheck size={10} style={{ color: '#4D9EFF', opacity: 0.6 }} />
+            <span style={{ color: 'rgba(77,158,255,0.45)' }}>SIGNED · {event.hash}</span>
+          </div>
+        </motion.div>
       </div>
     </motion.div>
   )
 }
 
-// ─── Chain connector with flowing particle ─────────────────────────────────────
+// ─── Chain connector with a single traveling particle ─────────────────────────
 function ChainConnector({ index }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.3, delay: index * 0.13 + 0.32 }}
-      className="flex flex-col items-center gap-0"
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.4, delay: index * 0.09 + 0.3, ease: 'easeOut' }}
+      className="flex flex-col items-center"
     >
-      {/* Top line + flowing particle */}
-      <div className="relative flex flex-col items-center" style={{ height: 22 }}>
-        <div className="w-px h-full" style={{ background: 'rgba(77,158,255,0.12)' }} />
-        {/* Particle traveling down */}
+      {/* Top segment */}
+      <div className="relative flex justify-center" style={{ width: 1, height: 18 }}>
+        <div className="absolute inset-0" style={{ background: 'rgba(77,158,255,0.1)' }} />
         <motion.div
-          animate={{ y: [0, 22], opacity: [0, 1, 0] }}
-          transition={{ duration: 1.4, repeat: Infinity, delay: index * 0.25, ease: 'linear' }}
+          animate={{ y: [0, 18], opacity: [0, 0.8, 0] }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            delay: index * 0.3,
+            ease: 'linear',
+          }}
           style={{
-            position: 'absolute', top: 0,
-            width: 4, height: 4, borderRadius: '50%',
+            position: 'absolute', top: 0, left: '50%',
+            transform: 'translateX(-50%)',
+            width: 3, height: 3, borderRadius: '50%',
             background: '#4D9EFF',
-            boxShadow: '0 0 6px rgba(77,158,255,0.8)',
+            boxShadow: '0 0 4px rgba(77,158,255,0.7)',
           }}
         />
       </div>
 
       {/* Label */}
-      <motion.span
+      <span
         className="font-mono text-[9px] px-2 py-0.5 rounded"
         style={{
-          color: 'rgba(77,158,255,0.28)',
-          border: '1px solid rgba(77,158,255,0.07)',
-          background: 'rgba(77,158,255,0.03)',
+          color: 'rgba(77,158,255,0.22)',
+          border: '1px solid rgba(77,158,255,0.06)',
+          background: 'rgba(77,158,255,0.02)',
+          letterSpacing: '0.04em',
         }}
       >
         sha256 chained ↓
-      </motion.span>
+      </span>
 
-      {/* Bottom line + flowing particle */}
-      <div className="relative flex flex-col items-center" style={{ height: 22 }}>
-        <div className="w-px h-full" style={{ background: 'rgba(77,158,255,0.12)' }} />
+      {/* Bottom segment */}
+      <div className="relative flex justify-center" style={{ width: 1, height: 18 }}>
+        <div className="absolute inset-0" style={{ background: 'rgba(77,158,255,0.1)' }} />
         <motion.div
-          animate={{ y: [0, 22], opacity: [0, 1, 0] }}
-          transition={{ duration: 1.4, repeat: Infinity, delay: index * 0.25 + 0.7, ease: 'linear' }}
+          animate={{ y: [0, 18], opacity: [0, 0.8, 0] }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            delay: index * 0.3 + 0.9,
+            ease: 'linear',
+          }}
           style={{
-            position: 'absolute', top: 0,
-            width: 4, height: 4, borderRadius: '50%',
+            position: 'absolute', top: 0, left: '50%',
+            transform: 'translateX(-50%)',
+            width: 3, height: 3, borderRadius: '50%',
             background: '#4D9EFF',
-            boxShadow: '0 0 6px rgba(77,158,255,0.8)',
+            boxShadow: '0 0 4px rgba(77,158,255,0.7)',
           }}
         />
       </div>
-    </motion.div>
-  )
-}
-
-// ─── Staggered bullet list item ────────────────────────────────────────────────
-function BulletItem({ label, index }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -12 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.35, delay: 0.4 + index * 0.08, ease: 'easeOut' }}
-      className="flex items-center gap-2.5 font-mono text-xs"
-      style={{ color: 'rgba(255,255,255,0.28)' }}
-    >
-      <motion.div
-        animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2.5, repeat: Infinity, delay: index * 0.6 }}
-        className="w-1 h-1 rounded-full shrink-0"
-        style={{ background: 'rgba(77,158,255,0.55)' }}
-      />
-      {label}
     </motion.div>
   )
 }
@@ -257,81 +214,49 @@ export default function LedgerVisualization() {
     offset: ['start end', 'end start'],
   })
 
-  // 3D tilt: enters tilted 40°, flattens at center, slight back-tilt on exit
+  // 3D perspective tilt — enters slightly angled, resolves flat as it centres
   const rotateX = useTransform(
     scrollYProgress,
-    [0,   0.32, 0.68, 1],
-    [40,  0,    0,    -12]
+    [0,    0.3,  0.7,  1],
+    [22,   0,    0,   -6]
   )
-  // Slight Z scaling (zoom in as it arrives)
-  const scaleZ = useTransform(scrollYProgress, [0, 0.32], [0.92, 1])
-
-  // Left copy parallax
-  const copyY = useTransform(scrollYProgress, [0, 1], [50, -50])
+  // Subtle parallax on copy — moves slower than scroll
+  const copyY = useTransform(scrollYProgress, [0, 1], [36, -36])
 
   return (
     <section className="py-28 border-t border-[#141414] relative overflow-hidden">
 
-      {/* Ambient glow */}
+      {/* Radial ambient glow behind the cards */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 55% 45% at 62% 50%, rgba(77,158,255,0.05) 0%, transparent 70%)',
+            'radial-gradient(ellipse 50% 40% at 65% 52%, rgba(77,158,255,0.045) 0%, transparent 70%)',
         }}
         aria-hidden
       />
 
-      {/* Floating grid dots (decorative) */}
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [0, -18, 0],
-            opacity: [0.04, 0.10, 0.04],
-          }}
-          transition={{
-            duration: 3 + i * 0.7,
-            repeat: Infinity,
-            delay: i * 0.5,
-            ease: 'easeInOut',
-          }}
-          style={{
-            position: 'absolute',
-            left: `${12 + i * 13}%`,
-            top: `${20 + (i % 3) * 25}%`,
-            width: 4,
-            height: 4,
-            borderRadius: '50%',
-            background: '#4D9EFF',
-            pointerEvents: 'none',
-          }}
-        />
-      ))}
-
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-14 lg:gap-20 items-start">
 
-          {/* ── Left: copy (parallax) ─────────────────────────────────────── */}
+          {/* ── Left: copy ────────────────────────────────────────────────── */}
           <motion.div style={{ y: copyY }} className="lg:sticky lg:top-24 pt-4">
 
-            {/* Label */}
             <motion.p
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.45, ease: EASE }}
               className="text-xs font-mono text-[#4D9EFF] uppercase tracking-[0.2em] mb-4"
             >
               The Ledger
             </motion.p>
 
-            {/* Headline — words stagger in */}
             <motion.h2
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.5, delay: 0.08 }}
+              transition={{ duration: 0.5, delay: 0.06, ease: EASE }}
               className="text-3xl sm:text-[2.35rem] font-bold text-white leading-[1.12] tracking-tight mb-5"
             >
               Every action.
@@ -342,41 +267,39 @@ export default function LedgerVisualization() {
             </motion.h2>
 
             <motion.p
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.4, delay: 0.16 }}
+              transition={{ duration: 0.45, delay: 0.12, ease: EASE }}
               className="text-[#555] text-[1rem] leading-relaxed mb-8 max-w-sm"
             >
               Each event is SHA-256 chained to the previous — forming a
               tamper-evident ledger that survives even a full database breach.
             </motion.p>
 
-            {/* Live events indicator */}
+            {/* Status indicator */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.4, delay: 0.24, type: 'spring', stiffness: 260 }}
-              className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-xl mb-7"
+              transition={{ duration: 0.4, delay: 0.18, ease: EASE }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg mb-8"
               style={{
-                border: '1px solid rgba(77,158,255,0.18)',
-                background: 'rgba(77,158,255,0.05)',
+                border: '1px solid rgba(77,158,255,0.14)',
+                background: 'rgba(77,158,255,0.04)',
               }}
             >
-              <motion.span
-                animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 1.4, repeat: Infinity }}
-                className="w-1.5 h-1.5 rounded-full shrink-0"
+              <span
+                className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0"
                 style={{ background: '#4ECD6A' }}
+                aria-hidden
               />
-              <Activity size={11} style={{ color: '#4D9EFF', opacity: 0.7 }} />
-              <span className="font-mono text-[11px]" style={{ color: 'rgba(77,158,255,0.65)' }}>
+              <span className="font-mono text-[11px]" style={{ color: 'rgba(77,158,255,0.55)' }}>
                 ingesting live events
               </span>
             </motion.div>
 
-            {/* Staggered bullets */}
+            {/* Bullet list — staggered */}
             <div className="space-y-3">
               {[
                 'Immutable WORM storage',
@@ -384,14 +307,29 @@ export default function LedgerVisualization() {
                 'Survives a primary DB breach',
                 'GraphQL query in < 50ms',
               ].map((label, i) => (
-                <BulletItem key={label} label={label} index={i} />
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.4, delay: 0.22 + i * 0.07, ease: EASE }}
+                  className="flex items-center gap-2.5 font-mono text-xs"
+                  style={{ color: 'rgba(255,255,255,0.26)' }}
+                >
+                  <div
+                    className="w-1 h-1 rounded-full shrink-0"
+                    style={{ background: 'rgba(77,158,255,0.45)' }}
+                  />
+                  {label}
+                </motion.div>
               ))}
             </div>
           </motion.div>
 
           {/* ── Right: 3D card stack ──────────────────────────────────────── */}
-          <div style={{ perspective: '1100px' }}>
-            <motion.div ref={cardStackRef} style={{ rotateX, scale: scaleZ }}>
+          <div style={{ perspective: '1200px' }}>
+            <motion.div ref={cardStackRef} style={{ rotateX }}>
+
               {EVENTS.map((event, i) => (
                 <div key={event.id}>
                   <AuditCard event={event} index={i} />
@@ -399,28 +337,28 @@ export default function LedgerVisualization() {
                 </div>
               ))}
 
-              {/* Sealed badge */}
+              {/* Sealed stamp */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: '-20px' }}
-                transition={{ duration: 0.4, delay: EVENTS.length * 0.13 + 0.15, type: 'spring' }}
+                transition={{ duration: 0.5, delay: EVENTS.length * 0.09 + 0.2, ease: 'easeOut' }}
                 className="mt-3 flex justify-end"
               >
-                <motion.div
-                  animate={{ boxShadow: ['0 0 0px rgba(77,158,255,0)', '0 0 12px rgba(77,158,255,0.15)', '0 0 0px rgba(77,158,255,0)'] }}
-                  transition={{ duration: 2.8, repeat: Infinity }}
+                <div
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg font-mono text-[10px]"
                   style={{
-                    border: '1px solid rgba(77,158,255,0.18)',
-                    background: 'rgba(77,158,255,0.05)',
-                    color: 'rgba(77,158,255,0.45)',
+                    border: '1px solid rgba(77,158,255,0.12)',
+                    background: 'rgba(77,158,255,0.03)',
+                    color: 'rgba(77,158,255,0.38)',
+                    letterSpacing: '0.04em',
                   }}
                 >
-                  <ShieldCheck size={11} style={{ color: '#4D9EFF', opacity: 0.7 }} />
+                  <ShieldCheck size={11} style={{ color: '#4D9EFF', opacity: 0.55 }} />
                   CHAIN INTEGRITY · VERIFIED · merkle:ok · WORM ✓
-                </motion.div>
+                </div>
               </motion.div>
+
             </motion.div>
           </div>
 

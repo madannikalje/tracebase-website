@@ -17,8 +17,8 @@ function CursorGlow() {
 
   useEffect(() => {
     const move = (e) => {
-      rawX.set(e.clientX - 44)   // center: ring is 88px wide
-      rawY.set(e.clientY - 44)
+      rawX.set(e.clientX - 26)   // center: ring is 52px wide
+      rawY.set(e.clientY - 26)
       document.documentElement.style.setProperty('--cx', `${e.clientX}px`)
       document.documentElement.style.setProperty('--cy', `${e.clientY}px`)
     }
@@ -39,7 +39,7 @@ function CursorGlow() {
     <motion.div
       className="fixed pointer-events-none"
       whileTap={{ scale: 1.4, opacity: 0.5 }}
-      style={{ width: 88, height: 88, x, y, zIndex: 9999 }}
+      style={{ width: 52, height: 52, x, y, zIndex: 9999 }}
     >
       {/* Outer ring */}
       <div style={{
@@ -53,7 +53,7 @@ function CursorGlow() {
         animate={{ rotate: 360 }}
         transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
         style={{
-          position: 'absolute', inset: 10, borderRadius: '50%',
+          position: 'absolute', inset: 6, borderRadius: '50%',
           border: `1px dashed ${accent}0.22)`,
         }}
       />
